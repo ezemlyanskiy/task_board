@@ -1,3 +1,5 @@
+using Domain.Enums;
+
 namespace WebApi.Contracts.Authentication;
 
 public record AuthenticationResponse(
@@ -5,5 +7,5 @@ public record AuthenticationResponse(
     string FirstName,
     string LastName,
     string Email,
-    string Role,
+    Role Role,
     string Token);

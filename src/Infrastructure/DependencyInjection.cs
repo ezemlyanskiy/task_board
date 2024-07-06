@@ -20,14 +20,23 @@ public static class DependencyInjection
         this IServiceCollection services,
         ConfigurationManager configuration)
     {
-        services.AddAuth(configuration);
-        services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
+        services
+            .AddAuth(configuration)
+            .AddPersistence();
 
-        services.AddScoped<IProjectsRepository, ProjectsRepository>();
-        services.AddScoped<IUsersRepository, UsersRepository>();
+        services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
 
         services.AddDbContext<ApplicationDbContext>(
             options => options.UseNpgsql(configuration.GetConnectionString(nameof(ApplicationDbContext))));
+
+        return services;
+    }
+
+    public static IServiceCollection AddPersistence(
+        this IServiceCollection services)
+    {
+        services.AddScoped<IUsersRepository, UsersRepository>();
+        services.AddScoped<IProjectsRepository, ProjectsRepository>();
 
         return services;
     }

@@ -1,18 +1,19 @@
 using Application.Common.Interfaces.Persistance;
+using Domain.Entities;
 using ErrorOr;
 using MediatR;
 
 namespace Application.Projects.Commands.Create;
 
 public class CreateProjectCommandHandler (IProjectsRepository projectsRepository) :
-    IRequestHandler<CreateProjectCommand, ErrorOr<int>>
+    IRequestHandler<CreateProjectCommand, ErrorOr<Project>>
 {
     private readonly IProjectsRepository _projectsRepository = projectsRepository;
 
-    public async Task<ErrorOr<int>> Handle(CreateProjectCommand command, CancellationToken cancellationToken)
+    public async Task<ErrorOr<Project>> Handle(CreateProjectCommand command, CancellationToken cancellationToken)
     {
-        var projectId = await _projectsRepository.CreateProject(command.Title, command.Description);
+        var project = new Project(command.Title, command.Description);
 
-        return projectId;
+        return await _projectsRepository.CreateProject(project);
     }
 }

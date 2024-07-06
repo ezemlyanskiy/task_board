@@ -3,8 +3,10 @@ using Application.Common.Interfaces.Authentication;
 using Application.Common.Interfaces.Persistance;
 using Domain.Common.Errors;
 using Domain.Entities;
+using Domain.Enums;
 using ErrorOr;
 using MediatR;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Application.Authentication.Commands.Register;
 
@@ -24,12 +26,17 @@ public class RegisterCommandHandler (
             return Errors.User.DuplicateEmail;
         }
 
+        if (!Enum.TryParse(command.Role, out Role userRole))
+        {
+            throw new Exception("There was an error during enum parsing.");
+        }
+
         var user = new User
         {
             FirstName = command.FirstName,
             LastName = command.LastName,
             Email = command.Email,
-            Role = command.Role,
+            Role = userRole,
             Password = command.Password
         };
 

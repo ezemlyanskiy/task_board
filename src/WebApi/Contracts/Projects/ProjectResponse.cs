@@ -1,6 +1,6 @@
 namespace WebApi.Contracts.Projects;
 
-public record ProjectsReponse(
+public record ProjectReponse(
     int Id,
     string Title,
     string Description);

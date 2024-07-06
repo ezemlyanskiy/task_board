@@ -12,10 +12,16 @@ namespace WebApi.Controllers;
 
 [Route("auth")]
 [AllowAnonymous]
-public class AuthenticationController(ISender mediator, IMapper mapper) : ApiController
+public class AuthenticationController : ApiController
 {
-    private readonly ISender _mediator = mediator;
-    private readonly IMapper _mapper = mapper;
+    private readonly ISender _mediator;
+    private readonly IMapper _mapper;
+
+    public AuthenticationController(ISender mediator, IMapper mapper)
+    {
+        _mediator = mediator;
+        _mapper = mapper;
+    }
 
     [HttpPost("register")]
     public async Task<IActionResult> Register(RegisterRequest request)

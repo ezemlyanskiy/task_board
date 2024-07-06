@@ -28,37 +28,29 @@ public class ProjectsRepository(ApplicationDbContext context) : IProjectsReposit
         return project;
     }
 
-    public async Task<int> CreateProject(string title, string description)
+    public async Task<Project> CreateProject(Project project)
     {
-        var project = new Project(
-            title,
-            description);
-
         await _context.Projects.AddAsync(project);
         await _context.SaveChangesAsync();
 
-        return project.Id;
+        return project;
     }
 
-    public async Task<int> UpdateProject(int id, string title, string description)
+    public async Task<Project> UpdateProject(int id, string title, string description)
     {
-        var project = await _context.Projects
-            .AsNoTracking()
-            .Where(p => p.Id == id)
-            .FirstOrDefaultAsync();
+        var project = await _context.Projects.FindAsync(id);
         
         if (project == null)
         {
-            throw new Exception($"Project with {id} not found.");
+            throw new Exception($"Project with id {id} not found.");
         }
 
-        await _context.Projects
-            .Where(p => p.Id == id)
-            .ExecuteUpdateAsync(p => p
-                .SetProperty(p => p.Title, p => title)
-                .SetProperty(p => p.Description, p => description));
+        project.Title = title;
+        project.Description = description;
+
+        await _context.SaveChangesAsync();
         
-        return id;
+        return project;
     }
 
     public async Task<int> DeleteProject(int id)
