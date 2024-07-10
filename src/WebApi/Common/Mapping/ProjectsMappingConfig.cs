@@ -13,7 +13,7 @@ public class ProjectsMappingConfig : IRegister
             .Map(dest => dest, src => src.Request);
 
         config.NewConfig<Project, ProjectResponse>()
-            .Map(dest => dest.Id, src => src.Id)
+            .Map(dest => dest.Id, src => src.Id.Value)
             .Map(dest => dest, src => src);
     }
 }
