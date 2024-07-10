@@ -1,27 +1,14 @@
-using Microsoft.AspNetCore.Mvc;
-using WebApi.Contracts.Projects;
-using Microsoft.AspNetCore.Authorization;
-using MediatR;
-using MapsterMapper;
-using Application.Projects.Queries.GetAll;
-using Application.Projects.Queries.GetById;
-using Application.Projects.Commands.Create;
-using Application.Projects.Commands.Update;
-using Application.Projects.Commands.Delete;
+using Application.Projects.Queries.GetAllProjects;
+using Application.Projects.Queries.GetProjectById;
+using Application.Projects.Commands.DeleteProject;
 
 namespace WebApi.Controllers;
 
 [Route("api/v1/[controller]")]
-public class ProjectsController : ApiController
+public class ProjectsController(ISender mediator, IMapper mapper) : ApiController
 {
-    private readonly ISender _mediator;
-    private readonly IMapper _mapper;
-
-    public ProjectsController(ISender mediator, IMapper mapper)
-    {
-        _mediator = mediator;
-        _mapper = mapper;
-    }
+    private readonly ISender _mediator = mediator;
+    private readonly IMapper _mapper = mapper;
 
     [HttpGet]
     public async Task<IActionResult> GetAll()
@@ -33,8 +20,8 @@ public class ProjectsController : ApiController
         return Ok(projects);
     }
 
-    [HttpGet("{id:int}")]
-    public async Task<IActionResult> GetProjectById(int id)
+    [HttpGet("{id:Guid}")]
+    public async Task<IActionResult> GetProjectById(Guid id)
     {
         var getResult = await _mediator.Send(new GetProjectByIdQuery(id));
 
@@ -45,40 +32,37 @@ public class ProjectsController : ApiController
 
     [HttpPost]
     [Authorize(Roles = "Admin, Manager")]
-    public async Task<IActionResult> CreateProject(
-        [FromBody] CreateUpdateProjectRequest request)
+    public async Task<IActionResult> CreateProject(ProjectRequest request)
     {
         var command = _mapper.Map<CreateProjectCommand>(request);
 
         var createProjectResult = await _mediator.Send(command);
 
         return createProjectResult.Match(
-            project => Ok(_mapper.Map<ProjectReponse>(project)),
+            project => Ok(_mapper.Map<ProjectResponse>(project)),
             errors => Problem(errors));
     }
 
-    [HttpPut("{id:int}")]
+    [HttpPut("{id:Guid}")]
     [Authorize(Roles = "Admin, Manager")]
     public async Task<IActionResult> UpdateProject(
-        [FromBody] CreateUpdateProjectRequest request,
-        int id)
+        Guid id,
+        ProjectRequest request)
     {
-        var command = _mapper.Map<UpdateProjectCommand>((request, id));
+        var command = _mapper.Map<UpdateProjectCommand>((id, request));
 
         var updateProjectResult = await _mediator.Send(command);
 
         return updateProjectResult.Match(
-            project => Ok(_mapper.Map<ProjectReponse>(project)),
+            project => Ok(_mapper.Map<ProjectResponse>(project)),
             errors => Problem(errors));
     }
 
-    [HttpDelete("{id:int}")]
+    [HttpDelete("{id:Guid}")]
     [Authorize(Roles = "Admin, Manager")]
-    public async Task<IActionResult> DeleteProject(int id)
+    public async Task<IActionResult> DeleteProject(Guid id)
     {
-        var command = new DeleteProjectCommand(id);
-
-        var deleteResult = await _mediator.Send(command);
+        var deleteResult = await _mediator.Send(new DeleteProjectCommand(id));
     
         return deleteResult.Match(
             id => Ok(id),

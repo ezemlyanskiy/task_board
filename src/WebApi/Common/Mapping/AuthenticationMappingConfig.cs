@@ -1,9 +1,3 @@
-using Application.Authentication.Commands.Register;
-using Application.Authentication.Common;
-using Application.Authentication.Queries.Login;
-using Mapster;
-using WebApi.Contracts.Authentication;
-
 namespace WebApi.Common.Mapping;
 
 public class AuthenticationMappingConfig : IRegister

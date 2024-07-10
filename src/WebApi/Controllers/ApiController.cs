@@ -1,8 +1,4 @@
-using ErrorOr;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using WebApi.Common.Http;
 
 namespace WebApi.Controllers;
 

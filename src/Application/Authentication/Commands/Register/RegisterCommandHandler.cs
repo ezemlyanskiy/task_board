@@ -1,18 +1,9 @@
-using Application.Authentication.Common;
-using Application.Common.Interfaces.Authentication;
-using Application.Common.Interfaces.Persistance;
-using Domain.Common.Errors;
-using Domain.Entities;
-using Domain.Enums;
-using ErrorOr;
-using MediatR;
-using Microsoft.AspNetCore.Mvc;
+using Domain.User.Enums;
 
 namespace Application.Authentication.Commands.Register;
 
-public class RegisterCommandHandler (
-    IJwtTokenGenerator jwtTokenGenerator,
-    IUsersRepository userRepository) : IRequestHandler<RegisterCommand, ErrorOr<AuthenticationResult>>
+public class RegisterCommandHandler (IJwtTokenGenerator jwtTokenGenerator, IUsersRepository userRepository)
+    : IRequestHandler<RegisterCommand, ErrorOr<AuthenticationResult>>
 {
     private readonly IJwtTokenGenerator _jwtTokenGenerator = jwtTokenGenerator;
     private readonly IUsersRepository _userRepository = userRepository;
@@ -31,14 +22,12 @@ public class RegisterCommandHandler (
             throw new Exception("There was an error during enum parsing.");
         }
 
-        var user = new User
-        {
-            FirstName = command.FirstName,
-            LastName = command.LastName,
-            Email = command.Email,
-            Role = userRole,
-            Password = command.Password
-        };
+        var user = User.Create(
+            firstName: command.FirstName,
+            lastName: command.LastName,
+            email: command.Email,
+            password: command.Password,
+            role: userRole);
 
         _userRepository.Add(user);
 

@@ -1,0 +1,11 @@
+global using MediatR;
+global using ErrorOr;
+global using Domain.User;
+global using Domain.Project;
+global using FluentValidation;
+global using Domain.Common.Errors;
+global using Domain.Project.ValueObjects;
+global using Application.Projects.Common;
+global using Application.Authentication.Common;
+global using Application.Common.Interfaces.Persistence;
+global using Application.Common.Interfaces.Authentication;

@@ -1,11 +1,10 @@
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 using System.Text;
-using Application.Common.Interfaces.Authentication;
-using Application.Common.Interfaces.Services;
-using Domain.Entities;
+using System.Security.Claims;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using Application.Common.Interfaces.Services;
+using Application.Common.Interfaces.Authentication;
 
 namespace Infrastructure.Authentication;
 
@@ -25,7 +24,7 @@ public class JwtTokenGenerator(
 
         var claims = new[]
         {
-            new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+            new Claim(JwtRegisteredClaimNames.Sub, user.Id.Value.ToString()),
             new Claim(JwtRegisteredClaimNames.GivenName, user.FirstName),
             new Claim(JwtRegisteredClaimNames.FamilyName, user.LastName),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),

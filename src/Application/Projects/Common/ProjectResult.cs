@@ -1,5 +1,6 @@
-using Domain.Entities;
-
 namespace Application.Projects.Common;
 
-public record ProjectResult(Project Project);
+public record ProjectResult(
+    string ProjectId,
+    string Title,
+    string Description);

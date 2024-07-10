@@ -1,16 +1,16 @@
 using System.Text;
-using Application.Common.Interfaces.Authentication;
-using Application.Common.Interfaces.Persistance;
-using Application.Common.Interfaces.Services;
-using Infrastructure.Authentication;
-using Infrastructure.Persistence;
 using Infrastructure.Services;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+using Infrastructure.Persistence;
+using Infrastructure.Authentication;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.Extensions.Configuration;
+using Application.Common.Interfaces.Services;
+using Infrastructure.Persistence.Repositories;
+using Microsoft.Extensions.DependencyInjection;
+using Application.Common.Interfaces.Persistence;
+using Application.Common.Interfaces.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace Infrastructure;
 
@@ -22,21 +22,22 @@ public static class DependencyInjection
     {
         services
             .AddAuth(configuration)
-            .AddPersistence();
+            .AddPersistence(configuration);
 
         services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
-
-        services.AddDbContext<ApplicationDbContext>(
-            options => options.UseNpgsql(configuration.GetConnectionString(nameof(ApplicationDbContext))));
 
         return services;
     }
 
     public static IServiceCollection AddPersistence(
-        this IServiceCollection services)
+        this IServiceCollection services,
+        ConfigurationManager configuration)
     {
         services.AddScoped<IUsersRepository, UsersRepository>();
         services.AddScoped<IProjectsRepository, ProjectsRepository>();
+
+        services.AddDbContext<TaskBoardDbContext>(
+            options => options.UseNpgsql(configuration.GetConnectionString(nameof(TaskBoardDbContext))));
 
         return services;
     }
