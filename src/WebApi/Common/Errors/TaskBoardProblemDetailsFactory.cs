@@ -2,6 +2,9 @@ using System.Diagnostics;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.AspNetCore.Mvc;
+using WebApi.Common.Http;
+using ErrorOr;
 
 namespace WebApi.Common.Errors;
 
@@ -10,11 +13,6 @@ public class TaskBoardProblemDetailsFactory : ProblemDetailsFactory
     private readonly ApiBehaviorOptions _options;
     private readonly Action<ProblemDetailsContext>? _configure;
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="DefaultProblemDetailsFactory"/> class.
-    /// </summary>
-    /// <param name="options">The options for API behavior.</param>
-    /// <param name="problemDetailsOptions">The options for customizing problem details.</param>
     public TaskBoardProblemDetailsFactory(
         IOptions<ApiBehaviorOptions> options,
         IOptions<ProblemDetailsOptions>? problemDetailsOptions = null)
@@ -23,8 +21,6 @@ public class TaskBoardProblemDetailsFactory : ProblemDetailsFactory
         _configure = problemDetailsOptions?.Value?.CustomizeProblemDetails;
     }
 
-    
-    /// <inheritdoc />
     public override ProblemDetails CreateProblemDetails(
         HttpContext httpContext,
         int? statusCode = null,
@@ -49,7 +45,6 @@ public class TaskBoardProblemDetailsFactory : ProblemDetailsFactory
         return problemDetails;
     }
 
-    /// <inheritdoc />
     public override ValidationProblemDetails CreateValidationProblemDetails(
         HttpContext httpContext,
         ModelStateDictionary modelStateDictionary,
@@ -73,7 +68,6 @@ public class TaskBoardProblemDetailsFactory : ProblemDetailsFactory
 
         if (title != null)
         {
-            // For validation problem details, don't overwrite the default title with null.
             problemDetails.Title = title;
         }
 

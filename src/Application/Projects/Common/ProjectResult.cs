@@ -1,6 +1,13 @@
 namespace Application.Projects.Common;
 
 public record ProjectResult(
-    string ProjectId,
+    Guid Id,
+    string Title,
+    string Description,
+    List<Guid> Users,
+    List<ProjectSprintResult> Sprints);
+
+public record ProjectSprintResult(
+    Guid Id,
     string Title,
     string Description);

@@ -1,4 +1,4 @@
-using Application.Common.Interfaces.Services;
+using Application.Common.Interfaces.Authentication;
 
 namespace Infrastructure.Services;
 

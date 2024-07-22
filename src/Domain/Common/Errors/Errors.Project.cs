@@ -1,11 +1,13 @@
+using ErrorOr;
+
 namespace Domain.Common.Errors;
 
 public static partial class Errors
 {
     public static class Project
     {
-        public static Error ProjectDoesNotExist => Error.Conflict(
+        public static Error DoesNotExist => Error.Conflict(
             code: "Project.DoesNotExist",
-            description: "Project does not exist."); 
+            description: "Project does not exist.");
     }
 }

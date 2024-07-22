@@ -1,3 +1,7 @@
+using ErrorOr;
+using FluentValidation;
+using MediatR;
+
 namespace Application.Common.Behaviors;
 
 public class ValidationBehavior<TRequest, TResponse>(IValidator<TRequest>? validator = null) :

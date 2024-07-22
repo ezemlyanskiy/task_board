@@ -1,9 +1,13 @@
+using ErrorOr;
+using WebApi.Common.Http;
+using Microsoft.AspNetCore.Mvc;
+// using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace WebApi.Controllers;
 
 [ApiController]
-[Authorize]
+// [Authorize]
 public class ApiController : ControllerBase
 {
     protected IActionResult Problem(List<Error> errors)

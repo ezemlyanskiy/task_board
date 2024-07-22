@@ -1,8 +1,11 @@
+using Application.Authentication.Common;
+using ErrorOr;
+using MediatR;
+
 namespace Application.Authentication.Commands.Register;
 
 public record RegisterCommand(
-    string FirstName,
-    string LastName,
     string Email,
     string Password,
-    string Role) : IRequest<ErrorOr<AuthenticationResult>>;
+    string ConfirmPassword,
+    string ClientUri) : IRequest<ErrorOr<AuthenticationResult>>;

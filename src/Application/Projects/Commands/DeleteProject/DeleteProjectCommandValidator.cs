@@ -1,3 +1,5 @@
+using FluentValidation;
+
 namespace Application.Projects.Commands.DeleteProject;
 
 public class DeleteProjectCommandValidator : AbstractValidator<DeleteProjectCommand>

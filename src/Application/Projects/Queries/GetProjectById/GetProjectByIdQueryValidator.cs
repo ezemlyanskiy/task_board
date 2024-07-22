@@ -1,3 +1,5 @@
+using FluentValidation;
+
 namespace Application.Projects.Queries.GetProjectById;
 
 public class GetProjectByIdQueryValidator : AbstractValidator<GetProjectByIdQuery>

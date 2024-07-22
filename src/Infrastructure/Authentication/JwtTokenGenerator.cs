@@ -3,8 +3,8 @@ using System.Security.Claims;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
-using Application.Common.Interfaces.Services;
 using Application.Common.Interfaces.Authentication;
+using Application.Authentication.Common;
 
 namespace Infrastructure.Authentication;
 
@@ -15,21 +15,24 @@ public class JwtTokenGenerator(
     private readonly IDateTimeProvider _dateTimeProvider = dateTimeProvider;
     private readonly JwtSettings _jwtSettings = jwtSettings.Value;
 
-    public string GenerateToken(User user)
+    public string GenerateToken(UserDto user, IList<string> roles)
     {
         var signingCredentials = new SigningCredentials(
             new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes(_jwtSettings.Secret)),
             SecurityAlgorithms.HmacSha256);
 
-        var claims = new[]
+        var claims = new List<Claim>
         {
-            new Claim(JwtRegisteredClaimNames.Sub, user.Id.Value.ToString()),
-            new Claim(JwtRegisteredClaimNames.GivenName, user.FirstName),
-            new Claim(JwtRegisteredClaimNames.FamilyName, user.LastName),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new Claim(ClaimTypes.Role, user.Role.ToString())
+            new(JwtRegisteredClaimNames.Sub, user.Id),
+            new(JwtRegisteredClaimNames.Email, user.Email!),
+            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
+
+        foreach (var role in roles)
+        {
+            claims.Add(new Claim(ClaimTypes.Role, role));
+        }
 
         var securityToken = new JwtSecurityToken(
             issuer: _jwtSettings.Issuer,

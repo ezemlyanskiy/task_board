@@ -1,3 +1,7 @@
+using Application.Common.Interfaces.Persistence;
+using Application.Projects.Common;
+using MediatR;
+
 namespace Application.Projects.Queries.GetAllProjects;
 
 public class GetAllProjectsQueryHandler (IProjectsRepository projectsRepository)
@@ -9,11 +13,18 @@ public class GetAllProjectsQueryHandler (IProjectsRepository projectsRepository)
         GetAllProjectsQuery query,
         CancellationToken cancellationToken)
     {
-        var projects = await _projectsRepository.GetAll();
+        var projects = await _projectsRepository.GetAllProjects();
 
-        var result = projects.Select(
-            p => new ProjectResult(p.Id.Value.ToString(), p.Title, p.Description));
+        var projectsResult = projects.Select(p =>
+            new ProjectResult(
+                p.Id,
+                p.Title,
+                p.Description,
+                p.UserIds!,
+                p.Sprints != null 
+                    ? p.Sprints!.Select(s => new ProjectSprintResult(s.Id, s.Title, s.Description)).ToList()
+                    : []));
 
-        return result;
+        return projectsResult;
     }
 }

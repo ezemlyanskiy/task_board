@@ -1,3 +1,5 @@
+using FluentValidation;
+
 namespace Application.Projects.Commands.CreateProject;
 
 public class CreateProjectCommandValidator : AbstractValidator<CreateProjectCommand>

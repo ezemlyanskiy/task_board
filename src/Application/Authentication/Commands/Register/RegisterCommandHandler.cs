@@ -1,44 +1,52 @@
-using Domain.User.Enums;
+using Application.Authentication.Common;
+using Application.Common.Interfaces.Services;
+using Application.Common.Interfaces.Services.Email;
+using Domain.Common.Constants;
+using Domain.Common.Errors;
+using ErrorOr;
+using MediatR;
+using Microsoft.AspNetCore.WebUtilities;
 
 namespace Application.Authentication.Commands.Register;
 
 public class RegisterCommandHandler (
-    IJwtTokenGenerator jwtTokenGenerator,
-    IUsersRepository userRepository,
-    IPasswordHasher passwordHasher)
+    IIdentityService identityService,
+    IEmailSender emailSender)
     : IRequestHandler<RegisterCommand, ErrorOr<AuthenticationResult>>
 {
-    private readonly IJwtTokenGenerator _jwtTokenGenerator = jwtTokenGenerator;
-    private readonly IUsersRepository _userRepository = userRepository;
-    private readonly IPasswordHasher _passwordHasher = passwordHasher;
+    private readonly IIdentityService _identityService = identityService;
+    private readonly IEmailSender _emailSender = emailSender;
 
     public async Task<ErrorOr<AuthenticationResult>> Handle(RegisterCommand command, CancellationToken cancellationToken)
     {
-        await Task.CompletedTask;
-
-        if (_userRepository.GetUserByEmail(command.Email) is not null)
+        if (await _identityService.DoesUserExistByEmail(command.Email))
         {
             return Errors.User.DuplicateEmail;
         }
 
-        if (!Enum.TryParse(command.Role, out Role userRole))
+        var (createResult, userId) = await _identityService.Add(command.Email, command.Password);
+
+        if (!createResult.Succeeded)
         {
-            throw new Exception("There was an error during enum parsing.");
+            return Errors.User.InvalidRequest;
         }
 
-        var hashedPassword = _passwordHasher.Generate(command.Password);
+        var token = await _identityService.GenerateEmailConfirmationTokenAsync(command.Email);
 
-        var user = User.Create(
-            firstName: command.FirstName,
-            lastName: command.LastName,
-            email: command.Email,
-            password: hashedPassword,
-            role: userRole);
+        var param = new Dictionary<string, string?>
+        {
+            { "token", token },
+            { "email", command.Email }
+        };
 
-        _userRepository.Add(user);
+        var callback = QueryHelpers.AddQueryString(command.ClientUri!, param);
+        
+        var message = new Message([ command.Email! ], "Email Confirmation Token", callback, null!);
 
-        var token = _jwtTokenGenerator.GenerateToken(user);
+        await _emailSender.SendEmailAsync(message);
 
-        return new AuthenticationResult(user, token);
+        await _identityService.AddToRoleAsync(command.Email, Roles.User);
+
+        return new AuthenticationResult { UserId = userId };
     }
 }
